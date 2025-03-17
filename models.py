@@ -1,9 +1,33 @@
-class Dispositivo:
-    def __init__(self, id, nombre, tipo, estado):
-        self.id = id
-        self.nombre = nombre
-        self.tipo = tipo
-        self.estado = estado
+from sqlalchemy import Column, Integer, String, ForeignKey, Date
+from sqlalchemy.orm import relationship
+from database import Base  # Importa la base de datos
 
-    def __str__(self):
-        return f"Dispositivo {self.id} - {self.nombre} - {self.tipo} - {self.estado}"
+class Usuario(Base):
+    __tablename__ = "usuarios"  # Nombre de la tabla en la bbdd
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    password = Column(String, nullable=False)
+    role = Column(String, nullable=False)
+
+    dispositivos = relationship("Dispositivo", back_populates="usuario")
+
+class Dispositivo(Base):
+    __tablename__ = "dispositivos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, nullable=False)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+
+    usuario = relationship("Usuario", back_populates="dispositivos")
+    activaciones = relationship("Activacion", back_populates="dispositivo")
+
+class Activacion(Base):
+    __tablename__ = "activaciones"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    descripcion = Column(String, nullable=False)
+    dispositivo_id = Column(Integer, ForeignKey("dispositivos.id"), nullable=False)
+
+    dispositivo = relationship("Dispositivo", back_populates="activaciones")
