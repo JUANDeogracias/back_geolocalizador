@@ -1,0 +1,28 @@
+# Ignorar el entorno virtual (venv)
+venv/
+
+# Ignorar archivos generados por Python
+__pycache__/
+*.py[cod]
+
+# Ignorar el archivo de configuración de la IDE (como PyCharm, VSCode)
+.idea/
+.vscode/
+
+# Ignorar archivos de configuración específicos de sistemas operativos
+*.swp
+.DS_Store
+Thumbs.db
+
+# Ignorar logs
+*.log
+
+# Ignorar los archivos de base de datos
+*.sqlite3
+
+# Ignorar archivos de cache de Python
+*.pyo
+*.pyd
+
+# Ignorar el archivo de dependencias del entorno (si no se usan directamente)
+*.egg-info/
