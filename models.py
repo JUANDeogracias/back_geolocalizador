@@ -20,14 +20,14 @@ class Dispositivo(Base):
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
 
     usuario = relationship("Usuario", back_populates="dispositivos")
-    activaciones = relationship("Activacion", back_populates="dispositivo")
+    registros = relationship("Registro", back_populates="dispositivo")
 
-class Activacion(Base):
-    __tablename__ = "activaciones"
+class Registro(Base):
+    __tablename__ = "registros"
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
     descripcion = Column(String, nullable=False)
     dispositivo_id = Column(Integer, ForeignKey("dispositivos.id"), nullable=False)
 
-    dispositivo = relationship("Dispositivo", back_populates="activaciones")
+    dispositivo = relationship("Dispositivo", back_populates="registros")

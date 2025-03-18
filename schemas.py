@@ -8,7 +8,7 @@ class UsuarioBase(BaseModel):
 class DispositivoBase(BaseModel):
     nombre: str
 
-class ActivacionBase(BaseModel):
+class RegistroBase(BaseModel):
     date: date
     descripcion: str
 
@@ -28,15 +28,15 @@ class DispositivoCreate(DispositivoBase):
 class DispositivoResponse(DispositivoBase):
     id: int
     usuario_id: int
-    activaciones: List["ActivacionResponse"] = []
+    activaciones: List["RegistroResponse"] = []
 
     class Config:
         from_attributes = True
 
-class ActivacionCreate(ActivacionBase):
+class RegistroCreate(RegistroBase):
     pass
 
-class ActivacionResponse(ActivacionBase):
+class RegistroResponse(RegistroBase):
     id: int
     dispositivo_id: int
 
