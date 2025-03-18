@@ -41,17 +41,17 @@ def obtener_dispositivos(db: Session = Depends(get_db)):
 
 # ---------------------- REGISTROS ----------------------
 @app.post("/api/registros/", response_model=RegistroResponse)
-def crear_activacion(activacion: RegistroCreate, db: Session = Depends(get_db)):
-    nueva_activacion = Registro(
-        date=activacion.date,
-        descripcion=activacion.descripcion,
-        dispositivo_id=activacion.dispositivo_id
+def crear_registro(registro: RegistroCreate, db: Session = Depends(get_db)):
+    nuevo_registro = Registro(
+        date=registro.date,
+        descripcion=registro.descripcion,
+        dispositivo_id=registro.dispositivo_id
     )
-    db.add(nueva_activacion)
+    db.add(Registro)
     db.commit()
-    db.refresh(nueva_activacion)
-    return nueva_activacion
+    db.refresh(nuevo_registro)
+    return nuevo_registro
 
 @app.get("/api/registros/", response_model=list[RegistroResponse])
-def obtener_activaciones(db: Session = Depends(get_db)):
+def obtener_registros(db: Session = Depends(get_db)):
     return db.query(Registro).all()

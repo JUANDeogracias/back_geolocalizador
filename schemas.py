@@ -28,7 +28,7 @@ class DispositivoCreate(DispositivoBase):
 class DispositivoResponse(DispositivoBase):
     id: int
     usuario_id: int
-    activaciones: List["RegistroResponse"] = []
+    registros: List["RegistroResponse"] = []
 
     class Config:
         from_attributes = True
