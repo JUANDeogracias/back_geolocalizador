@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Usuario, Dispositivo, Activacion
-from schemas import UsuarioCreate, UsuarioResponse, DispositivoCreate, DispositivoResponse, ActivacionCreate, ActivacionResponse
+from models import Usuario, Dispositivo, Registro
+from schemas import UsuarioCreate, UsuarioResponse, DispositivoCreate, DispositivoResponse, RegistroBase, RegistroCreate, RegistroResponse
 
 app = FastAPI()
 
@@ -39,10 +39,10 @@ def crear_dispositivo(dispositivo: DispositivoCreate, db: Session = Depends(get_
 def obtener_dispositivos(db: Session = Depends(get_db)):
     return db.query(Dispositivo).all()
 
-# ---------------------- ACTIVACIONES ----------------------
-@app.post("/api/activaciones/", response_model=ActivacionResponse)
-def crear_activacion(activacion: ActivacionCreate, db: Session = Depends(get_db)):
-    nueva_activacion = Activacion(
+# ---------------------- REGISTROS ----------------------
+@app.post("/api/registros/", response_model=RegistroResponse)
+def crear_activacion(activacion: RegistroCreate, db: Session = Depends(get_db)):
+    nueva_activacion = Registro(
         date=activacion.date,
         descripcion=activacion.descripcion,
         dispositivo_id=activacion.dispositivo_id
@@ -52,6 +52,6 @@ def crear_activacion(activacion: ActivacionCreate, db: Session = Depends(get_db)
     db.refresh(nueva_activacion)
     return nueva_activacion
 
-@app.get("/api/activaciones/", response_model=list[ActivacionResponse])
+@app.get("/api/registros/", response_model=list[RegistroResponse])
 def obtener_activaciones(db: Session = Depends(get_db)):
-    return db.query(Activacion).all()
+    return db.query(Registro).all()
