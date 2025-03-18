@@ -1,57 +1,45 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
+from database import engine
+import models
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from database import get_db
-from models import Usuario, Dispositivo, Registro
-from schemas import UsuarioCreate, UsuarioResponse, DispositivoCreate, DispositivoResponse, RegistroBase, RegistroCreate, RegistroResponse
+import models, schemas, database
+from sqlalchemy.orm import joinedload
+
+
+# Crear las tablas
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# ---------------------- USUARIOS ----------------------
-@app.post("/api/usuarios/", response_model=UsuarioResponse)
-def crear_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
-    nuevo_usuario = Usuario(
-        username=usuario.username,
-        password=usuario.password,
-        role=usuario.role
-    )
-    db.add(nuevo_usuario)
-    db.commit()
-    db.refresh(nuevo_usuario)
-    return nuevo_usuario
+@app.get("/")
+def read_root():
+    return {"message": "Bienvenido a la API de dispositivos"}
 
-@app.get("/api/usuarios/", response_model=list[UsuarioResponse])
-def obtener_usuarios(db: Session = Depends(get_db)):
-    return db.query(Usuario).all()
 
-# ---------------------- DISPOSITIVOS ----------------------
-@app.post("/api/dispositivos/", response_model=DispositivoResponse)
-def crear_dispositivo(dispositivo: DispositivoCreate, db: Session = Depends(get_db)):
-    nuevo_dispositivo = Dispositivo(
-        nombre=dispositivo.nombre,
-        usuario_id=dispositivo.usuario_id
-    )
-    db.add(nuevo_dispositivo)
-    db.commit()
-    db.refresh(nuevo_dispositivo)
-    return nuevo_dispositivo
+# Endpoints
 
-@app.get("/api/dispositivos/", response_model=list[DispositivoResponse])
-def obtener_dispositivos(db: Session = Depends(get_db)):
-    return db.query(Dispositivo).all()
+app = FastAPI()
 
-# ---------------------- REGISTROS ----------------------
-@app.post("/api/registros/", response_model=RegistroResponse)
-def crear_registro(registro: RegistroCreate, db: Session = Depends(get_db)):
-    nuevo_registro = Registro(
-        date=registro.date,
-        descripcion=registro.descripcion,
-        dispositivo_id=registro.dispositivo_id
-    )
-    db.add(Registro)
-    db.commit()
-    db.refresh(nuevo_registro)
-    return nuevo_registro
+# Dependencia para obtener la sesión de la base de datos
+def get_db():
+    db = database.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-@app.get("/api/registros/", response_model=list[RegistroResponse])
-def obtener_registros(db: Session = Depends(get_db)):
-    return db.query(Registro).all()
+
+
+@app.get("/dispositivo/{dispositivo_id}", response_model=schemas.Dispositivo)
+def get_dispositivo(dispositivo_id: int, db: Session = Depends(get_db)):
+    # Ejecutamos la consulta correctamente con .first() para obtener solo un dispositivo
+    db_dispositivo = db.query(models.Dispositivo).options(joinedload(models.Dispositivo.registros)).filter(models.Dispositivo.id == dispositivo_id).first()
+
+    # Si no encontramos el dispositivo, lanzamos un error 404
+    if db_dispositivo is None:
+        raise HTTPException(status_code=404, detail="Dispositivo no encontrado")
+    
+    # Devolvemos el dispositivo con todos sus registros asociados
+    return db_dispositivo
+

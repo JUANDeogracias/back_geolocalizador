@@ -1,33 +1,49 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.orm import relationship
-from database import Base  # Importa la base de datos
+from database import Base
+from typing import List
+from sqlalchemy.orm import Mapped, mapped_column
 
+# Modelo para la tabla 'usuarios'
 class Usuario(Base):
-    __tablename__ = "usuarios"  # Nombre de la tabla en la bbdd
+    __tablename__ = 'usuarios'
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True, nullable=False)
-    password = Column(String, nullable=False)
-    role = Column(String, nullable=False)
+    username = Column(String, index=True)
+    role = Column(String, unique=True)
+    password = Column(String)
 
-    dispositivos = relationship("Dispositivo", back_populates="usuario")
+    # Relación con dispositivos
+    dispositivos = relationship("Dispositivo", back_populates="owner")
 
+# Modelo para la tabla 'registros'
+class Registro(Base):
+    __tablename__ = 'registros'
+
+    id = Column(Integer, primary_key=True, index=True)
+    dispositivo_id = Column(Integer, ForeignKey('dispositivos.id'))
+    descripcion = Column(String)
+    date = Column(Date)
+
+    # Relación con dispositivo
+    dispositivo = relationship("Dispositivo", back_populates="registros")
+    dispositivo: Mapped['Dispositivo'] = relationship("Dispositivo", back_populates="registros")
+
+# Modelo para la tabla 'dispositivos'
 class Dispositivo(Base):
-    __tablename__ = "dispositivos"
+    __tablename__ = 'dispositivos'
 
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, nullable=False)
-    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+    usuario_id = Column(Integer, ForeignKey('usuarios.id'))
+    nombre = Column(String)
 
-    usuario = relationship("Usuario", back_populates="dispositivos")
+
+    # Relación con registros
     registros = relationship("Registro", back_populates="dispositivo")
 
-class Registro(Base):
-    __tablename__ = "registros"
+    # Relación con usuario
+    owner = relationship("Usuario", back_populates="dispositivos")
+    registros: Mapped[List['Registro']] = relationship("Registro", back_populates="dispositivo")
 
-    id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date, nullable=False)
-    descripcion = Column(String, nullable=False)
-    dispositivo_id = Column(Integer, ForeignKey("dispositivos.id"), nullable=False)
 
-    dispositivo = relationship("Dispositivo", back_populates="registros")
+

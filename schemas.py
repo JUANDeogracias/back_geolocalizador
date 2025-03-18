@@ -1,46 +1,52 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import List
-class UsuarioBase(BaseModel):
+from typing import List, Optional
+
+# Esquema para la creación de un usuario
+class UsuarioCreate(BaseModel):
     username: str
-    password: str
     role: str
-class DispositivoBase(BaseModel):
-    nombre: str
+    password: str
 
-class RegistroBase(BaseModel):
-    date: date
-    descripcion: str
-
-class UsuarioCreate(UsuarioBase):
-    pass
-
-class UsuarioResponse(UsuarioBase):
-    id : int
-    dispositivos: List["DispositivoResponse"] = []
-
-    class Config:
-        from_attributes = True
-
-class DispositivoCreate(DispositivoBase):
-    pass
-
-class DispositivoResponse(DispositivoBase):
+# Esquema para la respuesta del usuario
+class Usuario(BaseModel):
     id: int
-    usuario_id: int
-    registros: List["RegistroResponse"] = []
+    username: str
+    role: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
-class RegistroCreate(RegistroBase):
-    pass
 
-class RegistroResponse(RegistroBase):
+# Esquema para la creación de un registro
+class RegistroCreate(BaseModel):
+    dispositivo_id: int
+    descripcion: str
+    date: Optional[date] = None
+
+# Esquema para la respuesta del registro
+class Registro(BaseModel):
     id: int
     dispositivo_id: int
+    descripcion: str
+    date: date
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
+# Esquema para la creación de un dispositivo
+class DispositivoCreate(BaseModel):
+    usuario_id: int
+    nombre: str
+
+# Esquema para la respuesta del dispositivo
+class Dispositivo(BaseModel):
+    id: int
+    usuario_id: int
+    nombre: str
+    registros: List[Registro] 
+
+    class Config:
+        orm_mode = True
 
 
